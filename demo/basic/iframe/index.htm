@@ -6,28 +6,75 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/4.0.2/bootstrap-material-design.css"
   />
   <link rel="stylesheet" href="../../common/index.css" />
-
-  <script src="../../../dist/zoid.js"></script>
-  <script src="./login.js"></script>
 </head>
 
 <body>
-  <h3>Log in on xyz.com</h3>
-
-  <div id="container"></div>
-
-  <div id="result"></div>
+  <iframe
+    id="dynamicFrame"
+    src="about:blank"
+    style="
+      display: block !important;
+      margin: 0 !important;
+      width: 50% !important;
+      height: 100vh !important;
+      position: fixed;
+      top: 0;
+      right: 0;
+      border: none;
+    "
+  ></iframe>
 
   <script>
     // Render the component
+    async function fetchIframeContent() {
+      try {
+        const response = await fetch("iframe.htm");
+        return await response.text();
+      } catch (error) {
+        console.error("Error fetching iframe.html:", error);
+        return "<p>Error loading content</p>";
+      }
+    }
 
-    MyLoginZoidComponent({
-      prefilledEmail: "foo@bar.com",
+    // Function to inject content into the iframe
+    // This works for Chrome and Safari
+    async function injectContent_Good() {
+      const iframe = document.getElementById("dynamicFrame");
+      const content = await fetchIframeContent();
 
-      onLogin: function (email) {
-        console.log("User logged in with email:", email);
-        document.querySelector("#result").innerText = email + " logged in!";
-      },
-    }).render("#container");
+      // Use srcdoc attribute for Safari compatibility
+      iframe.srcdoc = content;
+
+      // Fallback for older browsers that don't support srcdoc
+      if (!("srcdoc" in iframe)) {
+        const iframeDoc =
+          iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(content);
+        iframeDoc.close();
+      }
+    }
+
+    // Function to inject content into the iframe contentDocument
+    // This works for Chrome but does not work for Safari
+    async function injectContent_Bad() {
+      const iframe = document.getElementById("dynamicFrame");
+      const content = await fetchIframeContent();
+
+      // Get the iframe's document object
+      let iframeDocument =
+        iframe.contentDocument || iframe.contentWindow.document;
+      // Write content to the iframe
+      iframeDocument.open();
+      iframeDocument.write(content);
+      iframeDocument.close();
+    }
+
+    // Call the function to inject content when the page loads
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", injectContent_Bad);
+    } else {
+      injectContent_Bad();
+    }
   </script>
 </body>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<head>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/4.0.2/bootstrap-material-design.css"
+  />
+  <link rel="stylesheet" href="../../common/index.css" />
+
+  <script src="../../component/dist/index.js"></script>
+</head>
+
+<body>
+  <h3>Log in on xyz.com</h3>
+
+  <div id="container"></div>
+
+  <div id="result"></div>
+
+  <button id="renderButton">Launch Login</button>
+
+  <script type="module">
+    function renderZoidComponent() {
+      let component = MyLoginZoidComponent({
+        prefilledEmail: "foo@bar.com",
+
+        onLogin: function (email) {
+          console.log("User logged in with email:", email);
+          document.querySelector("#result").innerText = email + " logged in!";
+        },
+      });
+
+      component.render("#container");
+
+      // Remove the renderButton after it's clicked
+      document.getElementById("renderButton").remove();
+    }
+
+    document
+      .getElementById("renderButton")
+      .addEventListener("click", renderZoidComponent);
+  </script>
+</body>

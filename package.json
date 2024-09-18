@@ -6,6 +6,7 @@
   "scripts": {
     "setup": "npm install && npm run flow-typed",
     "demo": "serve . -l 1337",
+    "demo_2": "serve . -l 1338",
     "lint": "eslint --ext .js --ext .jsx src/ test/ *.js",
     "flow-typed": "rm -rf ./flow-typed && flow-typed install",
     "flow": "flow",

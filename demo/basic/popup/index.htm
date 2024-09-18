@@ -26,19 +26,26 @@
       .querySelector("#popupLogin")
       .addEventListener("click", function () {
         // Hide the button
-
+        let display = document.querySelector("#popupLogin").style.display;
         document.querySelector("#popupLogin").style.display = "none";
 
-        // Render the component
-
-        MyLoginZoidComponent({
+        const component = MyLoginZoidComponent({
           prefilledEmail: "foo@bar.com",
 
           onLogin: function (email) {
             console.log("User logged in with email:", email);
             document.querySelector("#result").innerText = email + " logged in!";
           },
-        }).render("body", zoid.CONTEXT.POPUP);
+          onClose: function () {
+            console.log("User closed the login popup");
+            document.querySelector("#popupLogin").style.display = display;
+            document.querySelector("#result").innerText =
+              "User closed the login popup";
+          },
+        });
+
+        // Render the component
+        component.render("body", zoid.CONTEXT.POPUP);
       });
   </script>
 </body>
