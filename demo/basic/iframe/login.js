@@ -28,20 +28,20 @@ MyLoginZoidComponent = zoid.create({
     },
   },
 
-  // prerenderTemplate: ({ doc, props }) => {
-  //   const { nonce } = props;
-  //   return pragmatic
-  //     .node(
-  //       "html",
-  //       null,
-  //       pragmatic.node(
-  //         "body",
-  //         null,
-  //         pragmatic.node("div", { class: "spinner-page", nonce: nonce })
-  //       )
-  //     )
-  //     .render(pragmatic.dom({ doc }));
-  // },
+  prerenderTemplate: ({ doc, props }) => {
+    const { nonce } = props;
+    return pragmatic
+      .node(
+        "html",
+        null,
+        pragmatic.node(
+          "body",
+          null,
+          pragmatic.node("div", { class: "spinner-page", nonce: nonce })
+        )
+      )
+      .render(pragmatic.dom({ doc }));
+  },
 
   containerTemplate: ({
     uid,
@@ -111,9 +111,9 @@ MyLoginZoidComponent = zoid.create({
 
     const outletOnRender = (el) => {
       setupAnimations("component")(el);
-      // if (autoResize) {
-      //   setupAutoResize(el);
-      // }
+      if (autoResize) {
+        setupAutoResize(el);
+      }
     };
 
     let outlet;
@@ -163,13 +163,19 @@ MyLoginZoidComponent = zoid.create({
           pragmatic.node(
             "iframe",
             {
+              srcdoc: "",
+              // credentialless: true,
+              //referrerpolicy: "unsafe-url",
+              //csp: "default-src 'nonce-abc123' 'unsafe-inline'",
               title: "login Checkout Overlay",
               name: `__login_checkout_sandbox_${uid}__`,
-              //scrolling: "no",
+              scrolling: "no",
               class: `login-checkout-sandbox-iframe${
                 fullScreen ? "-full" : ""
               }`,
-              //allow: "clipboard-write",
+              // sandbox: "allow-scripts allow-same-origin allow-forms allow-popups",
+              // allow: "cross-origin-isolated",
+              // frameborder: "0",
             },
             [
               pragmatic.node("html", null, [
