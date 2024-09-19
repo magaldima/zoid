@@ -26,7 +26,7 @@ const MyLoginZoidComponent = create({
   },
 
   // The url that will be loaded in the iframe or popup, when someone includes my component on their page
-  url: "http://localhost:1338/demo/basic/iframe/login.htm",
+  url: "http://localhost:1337/demo/basic/iframe/login.htm",
 
   prerenderTemplate: ({ doc, props }: any) => {
     const { nonce } = props;

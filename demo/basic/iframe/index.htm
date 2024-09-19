@@ -9,20 +9,41 @@
 </head>
 
 <body>
-  <iframe
-    id="dynamicFrame"
-    src="about:blank"
-    style="
-      display: block !important;
-      margin: 0 !important;
-      width: 50% !important;
-      height: 100vh !important;
-      position: fixed;
-      top: 0;
-      right: 0;
-      border: none;
-    "
-  ></iframe>
+  <!-- This iframe works-->
+  <div>
+    <iframe
+      id="leftFrame"
+      src="about:blank"
+      style="
+        display: block !important;
+        margin: 0 !important;
+        width: 50% !important;
+        height: 100vh !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        border: none;
+      "
+    ></iframe>
+  </div>
+
+  <!-- This iframe does not work -->
+  <div>
+    <iframe
+      id="rightFrame"
+      src="about:blank"
+      style="
+        display: block !important;
+        margin: 0 !important;
+        width: 50% !important;
+        height: 100vh !important;
+        position: fixed;
+        top: 0;
+        right: 0;
+        border: none;
+      "
+    ></iframe>
+  </div>
 
   <script>
     // Render the component
@@ -39,41 +60,47 @@
     // Function to inject content into the iframe
     // This works for Chrome and Safari
     async function injectContent_Good() {
-      const iframe = document.getElementById("dynamicFrame");
+      const iframe = document.getElementById("leftFrame");
       const content = await fetchIframeContent();
 
-      // Use srcdoc attribute for Safari compatibility
-      iframe.srcdoc = content;
+      if (iframe) {
+        // Use srcdoc attribute for Safari compatibility
+        iframe.srcdoc = content;
 
-      // Fallback for older browsers that don't support srcdoc
-      if (!("srcdoc" in iframe)) {
-        const iframeDoc =
-          iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(content);
-        iframeDoc.close();
+        // Fallback for older browsers that don't support srcdoc
+        if (!("srcdoc" in iframe)) {
+          const iframeDoc =
+            iframe.contentDocument || iframe.contentWindow.document;
+          iframeDoc.open();
+          iframeDoc.write(content);
+          iframeDoc.close();
+        }
       }
     }
 
     // Function to inject content into the iframe contentDocument
     // This works for Chrome but does not work for Safari
     async function injectContent_Bad() {
-      const iframe = document.getElementById("dynamicFrame");
+      const iframe = document.getElementById("rightFrame");
       const content = await fetchIframeContent();
 
-      // Get the iframe's document object
-      let iframeDocument =
-        iframe.contentDocument || iframe.contentWindow.document;
-      // Write content to the iframe
-      iframeDocument.open();
-      iframeDocument.write(content);
-      iframeDocument.close();
+      if (iframe) {
+        // Get the iframe's document object
+        let iframeDocument =
+          iframe.contentDocument || iframe.contentWindow.document;
+        // Write content to the iframe
+        iframeDocument.open();
+        iframeDocument.write(content);
+        iframeDocument.close();
+      }
     }
 
     // Call the function to inject content when the page loads
     if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", injectContent_Good);
       document.addEventListener("DOMContentLoaded", injectContent_Bad);
     } else {
+      injectContent_Good();
       injectContent_Bad();
     }
   </script>

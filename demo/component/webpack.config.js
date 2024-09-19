@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   entry: "./src/index.ts",
   target: "web",
-  mode: "production",
+  mode: "development", // Changed from "production" to "development"
   module: {
     rules: [
       {
@@ -28,5 +28,11 @@ module.exports = {
     filename: "index.js",
     path: path.resolve(__dirname, "dist"),
     libraryTarget: "umd",
+  },
+  externals: {
+    "@krakenjs/zoid": "zoid",
+  },
+  optimization: {
+    minimize: false, // Added to prevent minification
   },
 };
