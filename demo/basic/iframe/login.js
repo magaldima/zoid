@@ -28,21 +28,6 @@ MyLoginZoidComponent = zoid.create({
     },
   },
 
-  // prerenderTemplate: ({ doc, props }) => {
-  //   const { nonce } = props;
-  //   return pragmatic
-  //     .node(
-  //       "html",
-  //       null,
-  //       pragmatic.node(
-  //         "body",
-  //         null,
-  //         pragmatic.node("div", { class: "spinner-page", nonce: nonce })
-  //       )
-  //     )
-  //     .render(pragmatic.dom({ doc }));
-  // },
-
   containerTemplate: ({
     uid,
     tag,
@@ -111,9 +96,9 @@ MyLoginZoidComponent = zoid.create({
 
     const outletOnRender = (el) => {
       setupAnimations("component")(el);
-      // if (autoResize) {
-      //   setupAutoResize(el);
-      // }
+      if (autoResize) {
+        setupAutoResize(el);
+      }
     };
 
     let outlet;
@@ -161,78 +146,60 @@ MyLoginZoidComponent = zoid.create({
         [
           pragmatic.node("style", { nonce: nonce }, getSandboxStyle({ uid })),
           pragmatic.node(
-            "iframe",
+            "div",
             {
-              title: "login Checkout Overlay",
-              name: `__login_checkout_sandbox_${uid}__`,
-              //scrolling: "no",
-              class: `login-checkout-sandbox-iframe${
-                fullScreen ? "-full" : ""
-              }`,
-              //allow: "clipboard-write",
+              id: uid,
+              onClick: focusCheckout,
+              class: `login-overlay-context-${context} login-checkout-overlay`,
             },
             [
-              pragmatic.node("html", null, [
-                pragmatic.node("body", null, [
-                  pragmatic.node(
-                    "div",
-                    {
-                      id: uid,
-                      onClick: focusCheckout,
-                      class: `login-overlay-context-${context} login-checkout-overlay`,
-                    },
-                    [
-                      !hideCloseButton &&
-                        pragmatic.node("a", {
-                          href: "#",
-                          class: "login-checkout-close",
-                          onClick: closeCheckout,
-                          "aria-label": "close",
-                          role: "button",
-                        }),
-                      !fullScreen &&
-                        pragmatic.node(
-                          "div",
-                          { class: "login-checkout-modal" },
-                          [
-                            content.windowMessage &&
-                              pragmatic.node(
-                                "div",
-                                { class: "login-checkout-message" },
-                                content.windowMessage
-                              ),
-                            content.continueMessage &&
-                              pragmatic.node(
-                                "div",
-                                { class: "login-checkout-continue" },
-                                [
-                                  pragmatic.node(
-                                    "a",
-                                    { onClick: focus, href: "#" },
-                                    content.continueMessage
-                                  ),
-                                ]
-                              ),
-                          ]
-                        ),
+              !hideCloseButton &&
+                pragmatic.node("a", {
+                  href: "#",
+                  class: "login-checkout-close",
+                  onClick: closeCheckout,
+                  "aria-label": "close",
+                  role: "button",
+                }),
+              !fullScreen &&
+                pragmatic.node(
+                  "div",
+                  { class: "login-checkout-modal" },
+                  [
+                    content.windowMessage &&
                       pragmatic.node(
                         "div",
-                        {
-                          class: fullScreen
-                            ? "login-checkout-iframe-container-full"
-                            : "login-checkout-iframe-container",
-                        },
-                        [outlet]
+                        { class: "login-checkout-message" },
+                        content.windowMessage
                       ),
+                    content.continueMessage &&
                       pragmatic.node(
-                        "style",
-                        { nonce: nonce },
-                        getContainerStyle({ uid })
+                        "div",
+                        { class: "login-checkout-continue" },
+                        [
+                          pragmatic.node(
+                            "a",
+                            { onClick: focus, href: "#" },
+                            content.continueMessage
+                          ),
+                        ]
                       ),
-                    ]
-                  ),
-                ]),
-              ]),
+                  ]
+                ),
+              pragmatic.node(
+                "div",
+                {
+                  class: fullScreen
+                    ? "login-checkout-iframe-container-full"
+                    : "login-checkout-iframe-container",
+                },
+                [outlet]
+              ),
+              pragmatic.node(
+                "style",
+                { nonce: nonce },
+                getContainerStyle({ uid })
+              ),
             ]
           ),
         ]
@@ -270,21 +237,6 @@ function getSandboxStyle(props) {
             animation-iteration-count: 1;
             animation-fill-mode: forwards !important;
             opacity: 0;
-        }
-
-        #${uid}.login-checkout-sandbox .login-checkout-sandbox-iframe {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        #${uid}.login-checkout-sandbox .login-checkout-sandbox-iframe-full {
-            border: 0;
-            height: 100%;
-            width: 100vw;
         }
 
         @keyframes show-container {
@@ -389,11 +341,7 @@ function getContainerStyle(props) {
             padding: 0px 0;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-message, #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-continue {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-message, #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-continue {
             display: none;
         }
 
@@ -445,152 +393,94 @@ function getContainerStyle(props) {
             display: none;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container,
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container > .${"outlet"},
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container > .${"outlet"} > iframe {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container,
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container > .${"outlet"},
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container > .${"outlet"} > .component-frame {
             max-height: 95vh;
             max-width: 95vw;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full,
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full > .${"outlet"},
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full > .${"outlet"} > iframe {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full,
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full > .${"outlet"},
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full > .${"outlet"} > .component-frame {
             height: 100vh;
             max-width: 100vw;
             width: 100vw;
         }
 
         @media screen and (max-width: 390px) {
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container,
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container > .${"outlet"},
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container > .${"outlet"} > iframe {
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container,
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container > .${"outlet"},
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container > .${"outlet"} > .component-frame {
                 max-height: 90vh;
             }
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full,
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full > .${"outlet"},
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container-full > .${"outlet"} > iframe {
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full,
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full > .${"outlet"},
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container-full > .${"outlet"} > .component-frame {
                 height: 100vh;
             }
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container {
-
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container {
             display: block;
-
             position: absolute;
-
             top: 50%;
             left: 50%;
-
             min-width: 390px;
-
             transform: translate(-50%, -50%);
             transform: translate3d(-50%, -50%, 0);
-
             border-radius: 10px;
             overflow: hidden;
         }
 
         #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} {
-
             position: relative;
-
             transition: all 0.3s ease;
             animation-duration: 0.3s;
             animation-fill-mode: forwards !important;
-
             min-width: 390px;
             max-width: 390px;
             width: 390px;
             height: 535px;
-
             background-color: white;
-
             overflow: auto;
-
             opacity: 0;
             transform: scale3d(.3, .3, .3);
-
             -webkit-overflow-scrolling: touch;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} > iframe {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} > .component-frame {
             position: absolute;
             top: 0;
             left: 0;
             transition: opacity .4s ease-in-out;
-        }
-
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} > iframe.${"component-frame"} {
             z-index: 100;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} > iframe.${"prerender-frame"} {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} > .prerender-frame {
             z-index: 200;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} > iframe.${"visible"} {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} > .visible {
             opacity: 1;
             z-index: 200;
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} > iframe.${"invisible"} {
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} > .invisible {
             opacity: 0;
             z-index: 100;
         }
 
         @media screen and (max-width: 390px) {
-
-            #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .login-checkout-iframe-container,
+            #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .login-checkout-iframe-container,
             #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} {
                 min-width: 100%;
                 max-width: 100%;
             }
         }
 
-        #${uid}.login-overlay-context-${
-    zoid.CONTEXT.IFRAME
-  } .${"outlet"} iframe {
-            width: 1px;
-            min-width: 100%;
+        #${uid}.login-overlay-context-${zoid.CONTEXT.IFRAME} .${"outlet"} .component-frame {
+            width: 100%;
             height: 100%;
         }
 
